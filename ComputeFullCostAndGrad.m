@@ -26,7 +26,7 @@ end
 
 if nargout > 1
     parfor i = 1:N
-        [localCost, localGrad, localPred] = ...
+        [localCost, localGrad, localPred, localPredDist] = ...
             ComputeCostAndGrad(theta, decoder, data(i), hyperParams);
         accumulatedCost = accumulatedCost + localCost;
         accumulatedGrad = accumulatedGrad + localGrad;

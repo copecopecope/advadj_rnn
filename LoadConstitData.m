@@ -7,7 +7,7 @@ if isempty(strfind(filename, '/'))
     if strfind(filename, 'quant_')
         filename = ['grammars/data/', filename];
     else   
-        filename = ['data-4/', filename];
+        filename = ['data-hold/', filename];
     end
 end
 fid = fopen(filename);
@@ -51,6 +51,7 @@ end
 disp('Done Reading in File');
 
 rawData = rawData(1:itemNo - 1);
+rawData
 
 % Build the dataset
 data = repmat(struct('relation', 0, 'leftTree', Tree(), 'rightTree', Tree()), ...

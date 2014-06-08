@@ -131,7 +131,7 @@ options.resetSumSqFreq = 10000; % Don't bother.
 disp(options)
 
 % Choose which files to load in each category.
-listing = dir('data-4/*.tsv');
+listing = dir('data-hold/*.tsv');
 listing5 = dir('data-5/*.tsv');
 listingG = dir('grammars/data/quant*');
 
