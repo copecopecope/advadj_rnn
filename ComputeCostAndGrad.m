@@ -163,6 +163,7 @@ end
 
 if nargout > 3
    predDist = relationProbs;
+   
 end
 
 end

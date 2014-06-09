@@ -1,5 +1,6 @@
 function [goldDist, map] = SplitData(filename, minPairs, outTest, outTrain)
 
+filename = ['data-hold/', filename];
 fid = fopen(filename);
 C = textscan(fid,'%s','delimiter',sprintf('\n'));
 fclose(fid);
@@ -20,8 +21,8 @@ for i=2:maxLine
 
     rating = splitLine{1};
     rating = str2num(rating);
-    adv = splitLine{3};
-    adj = splitLine{4};
+    adv = splitLine{2};
+    adj = splitLine{3};
     advadj = strcat(adv,',',adj);
     
     if ~isKey(A,advadj)
