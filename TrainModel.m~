@@ -96,7 +96,7 @@ options.OutputFcn = @Display;
 
 % Rarely does anything interesting happen past 
 % ~iteration ~200.
-options.numPasses = 1000;
+options.numPasses = 300;
 options.miniBatchSize = mbs;
 
 % LR
@@ -131,7 +131,7 @@ options.resetSumSqFreq = 10000; % Don't bother.
 disp(options)
 
 % Choose which files to load in each category.
-listing = dir('data-4/*.tsv');
+listing = dir('data-hold/*.tsv');
 listing5 = dir('data-5/*.tsv');
 listingG = dir('grammars/data/quant*');
 
@@ -254,6 +254,11 @@ end
 % Randomly initialize.
 [ theta, thetaDecoder ] = InitializeModel(size(wordMap, 1), hyperParams);
 
+% Create gold matrix (and split data)
+minpairs = 1;
+fname = 'imdb-small.tsv';
+[ goldDist, map ] = SplitData(fname,minpairs);
+
 
 % Load training/test data
 [trainDataset, testDatasets] = ...
@@ -292,11 +297,11 @@ end
 
 % Done. Evaluate final model on training data.
 % (Mid-run results are usually better.)
-[~, ~, trAcc, trConfusion] = ComputeFullCostAndGrad(theta, ...
+[~, ~, trAcc, trConfusion, predDist] = ComputeFullCostAndGrad(theta, ...
     thetaDecoder, trainDataset, hyperParams);
 
 disp('Training confusion, PER: ')
-disp('tr:  1    2   3   4   5   6   7   8   9   10')
+disp('tr:  1     2     3     4     5     6     7     8     9     10')
 disp(trConfusion)
 disp(trAcc)
 
@@ -305,17 +310,18 @@ disp(trAcc)
 
 % Print results for all three full datasets
 disp('Word pair confusion, PER: ')
-disp('tr:  #     =     >     <     |     ^     v')
+disp('tr:  1     2     3     4     5     6     7     8     9     10')
 %disp(preConfusion)
 %disp(preAcc)
 
 disp('Training confusion, PER: ')
-disp('tr:  #     =     >     <     |     ^     v')
+disp('tr:  1     2     3     4     5     6     7     8     9     10')
 disp(trConfusion)
+disp(trAcc)
 disp(trAcc)
 
 disp('Test confusion, PER: ')
-disp('tr:  #     =     >     <     |     ^     v')
+disp('tr:  1     2     3     4     5     6     7     8     9     10')
 disp(teConfusion)
 disp(teAcc)
 
