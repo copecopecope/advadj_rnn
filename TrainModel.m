@@ -255,8 +255,8 @@ end
 [ theta, thetaDecoder ] = InitializeModel(size(wordMap, 1), hyperParams);
 
 % Create gold matrix (and split data)
-minpairs = 1;
-fname = 'imdb-small.tsv';
+minpairs = 0;
+fname = 'imdb-advadj-with-ratings.tsv';
 [ goldDist, map ] = SplitData(fname,minpairs);
 
 
@@ -297,7 +297,7 @@ end
 
 % Done. Evaluate final model on training data.
 % (Mid-run results are usually better.)
-[~, ~, trAcc, trConfusion, predDist] = ComputeFullCostAndGrad(theta, ...
+[~, ~, trAcc, trConfusion] = ComputeFullCostAndGrad(theta, ...
     thetaDecoder, trainDataset, hyperParams);
 
 disp('Training confusion, PER: ')
@@ -325,11 +325,11 @@ disp('tr:  1     2     3     4     5     6     7     8     9     10')
 disp(teConfusion)
 disp(teAcc)
 
-disp(goldDist)
-disp(predDist)
-
-KLdist = KLDiv(goldDist,predDist)
-
+% disp(goldDist)
+% disp(predDist)
+% 
+% KLdist = KLDiv(goldDist,predDist)
+% 
 
 
     
