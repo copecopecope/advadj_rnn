@@ -52,12 +52,9 @@ disp('Done Reading in File');
 
 rawData = rawData(1:itemNo - 1);
 
-minpairs = 1;
-fname = 'imdb-advadj-with-ratings.tsv';
-[ goldDist, map ] = SplitData(fname,minpairs);
 
 % Build the dataset
-data = repmat(struct('relation', 0, 'leftTree', Tree(), 'rightTree', Tree(), 'goldDist', zeros(1,10), 'predDist', zeros(1,10)), ...
+data = repmat(struct('relation', 0, 'leftTree', Tree(), 'rightTree', Tree(), 'leftText', '', 'rightText', ''), ...
     length(rawData), 1);
 
 % Build Trees
@@ -65,12 +62,8 @@ for dataInd = 1:length(rawData)
     data(dataInd).leftTree = Tree.makeTree(rawData(dataInd).leftText, wordMap);
     data(dataInd).rightTree = Tree.makeTree(rawData(dataInd).rightText, wordMap);
     data(dataInd).relation = rawData(dataInd).relation;
-    
-    advadj = strcat(rawData(dataInd).leftText,',',rawData(dataInd).rightText);
-    index = map(advadj);
-    data(dataInd).goldDist = goldDist(index, :);
-%     disp('gold Dist');
-%     disp(data(dataInd).goldDist);
+    data(dataInd).leftText = rawData(dataInd).leftText;
+    data(dataInd).rightText = rawData(dataInd).rightText;
 end
 
 disp('Done Making Trees');

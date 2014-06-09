@@ -1,9 +1,47 @@
 % Want to distribute this code? Have other questions? -> sbowman@stanford.edu
-function [ cost, grad, trainingError, confusion ] = ComputeFullCostAndGrad( theta, decoder, data, hyperParams, ~ )
+function [ cost, grad, trainingError, confusion, predDist ] = ComputeFullCostAndGrad( theta, decoder, data, hyperParams, ~ )
 % Compute gradient and cost with regularization over a set of examples
 % for some parameters.
 
 N = length(data);
+A = containers.Map;
+
+
+% Regenerate Map
+for i=2:N
+  if mod(i,1000) == 0
+     fprintf('.');
+  end
+  %adv = data(i).leftTree;
+    advadj = strcat(data(i).leftText,',',data(i).rightText)
+   
+    if ~isKey(A,advadj)
+       A(advadj) = zeros(1,10);
+    end
+end
+     
+allKeys = keys(A);
+lenKeys = length(allKeys);
+
+fprintf('Filtering out pairs with less than %d instances...\n', 1);
+for i=1:lenKeys
+  key = allKeys(i);
+  key = key{1};
+  numPairs = sum(A(key));
+  if numPairs < 1
+     remove(A,key);
+  end
+end
+
+predDist = zeros(lenKeys,10);
+map = containers.Map;
+totalPairs = 0;
+for i=1:lenKeys
+  key = allKeys(i);
+  key = key{1};
+  map(key) = i;
+end
+
 
 argout = nargout;
 if nargout > 3
@@ -24,14 +62,31 @@ if matlabpool('size') == 0 % checking to see if my pool is already open
     matlabpool;
 end
 
-aggKLDiv = 0;
-
 if nargout > 1
-    parfor i = 1:N
+    for i = 1:N
         [localCost, localGrad, localPred, localPredDist] = ...
             ComputeCostAndGrad(theta, decoder, data(i), hyperParams);
         accumulatedCost = accumulatedCost + localCost;
         accumulatedGrad = accumulatedGrad + localGrad;
+        
+       
+        advadj = strcat(data(i).leftText,',',data(i).rightText);
+        if isKey(map,advadj)
+            currInd = map(advadj);
+            distr = predDist(currInd,:);
+             for k = 1:10
+                distr(k) = distr(k) + localPredDist(k);
+                % TODO: check to make sure we should not be replacing current
+                % line rather than adding to it
+             end
+            predDist(currInd,:) = distr;
+        end
+    
+
+        
+        
+            
+        
         
         localCorrect = localPred == data(i).relation;
         ratingDifference = abs( (data(i).relation) - (localPred) );
@@ -42,30 +97,6 @@ if nargout > 1
 %         disp('diff');
 %         disp(ratingDifference);
 %         disp('-----------');
-
-        goldDist = data(i).goldDist;
-        localPredDist = transpose(localPredDist);
-        predDist = data(i).predDist;
-        predDist = predDist + localPredDist; %summing the old distr with new info
-        data(i).predDist = predDist;
-%         
-%         disp('goldDist');
-%         disp(goldDist);
-%         disp('localPredDist');
-%         disp(localPredDist);
-%         
-        tempKLDiv = KLDiv(goldDist, predDist);
-        %tempKLDiv = goldDist.*log(goldDist./localPredDist)
-        aggKLDiv = aggKLDiv + tempKLDiv;
-        
-%         % or is this how you calculate it?
-%         kldiv = 0;
-%         for i = 1:10
-%            temp = goldDist(1, i).*log(goldDist(1, i)./localPredDist(1, i));
-%            kldiv = kldiv + temp;
-%         end
-            
-        
         if (~localCorrect) && (argout > 2) && hyperParams.showExamples
             disp(['for: ', data(i).leftTree.getText, ' ', ...
                   hyperParams.relations{data(i).relation}, ' ', ... 
@@ -82,13 +113,15 @@ if nargout > 1
         accumulatedSuccess = accumulatedSuccess + localCorrect;
     end
     
-    %Calculates proportional average Euc Distance (?)
-    average = sqrt(totalDiff / N);
-    
-    %Calculates average KL Divergence
-    avgKLDiv = aggKLDiv / N
 
-     
+    
+    
+%      disp('totalDiff');
+%      disp(totalDiff);
+    average = sqrt(totalDiff / N);
+     disp('average Euclid Dist');
+     disp(average);
+    
     if nargout > 3
         confusion = zeros(hyperParams.numRelations);
         for i = 1:N
@@ -129,13 +162,13 @@ if nargout > 1
         grad = grad + hyperParams.lambda * sign(theta);
     end 
     trainingErrorSuccessRate = (accumulatedSuccess / N);
-%     disp('Percent Guess Exactly Right');
-%     disp(trainingErrorSuccessRate);
-%     disp('# Guessed Correctly');
-%     disp(accumulatedSuccess);
-%     disp('Out of:');
-%     disp(N);
-    trainingError = avgKLDiv;
+    disp('Percent Guess Exactly Right');
+    disp(trainingErrorSuccessRate);
+    disp('# Guessed Correctly');
+    disp(accumulatedSuccess);
+    disp('Out of:');
+    disp(N);
+    trainingError = average;
 end
 
 end

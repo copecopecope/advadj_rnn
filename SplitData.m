@@ -11,7 +11,7 @@ maxLine = length(C{1});
 
 disp('Generating map...')
 
-for i=2:maxLine
+for i=1:maxLine
   if mod(i,1000) == 0
      fprintf('.');
   end
