@@ -1,6 +1,6 @@
 % Want to distribute this code? Have other questions? -> sbowman@stanford.edu
 function [ trainDataset, testDatasetsCell ] = LoadConstitDatasets ...
-    (trainFilenames, splitFilenames, testFilenames, wordMap, relationMap)
+    (trainFilenames, splitFilenames, testFilenames, wordMap, relationMap, hyperParams)
 % Load and combine all of the training and test data.
 % This is slow. And can probably be easily improved if it matters.
 
@@ -15,19 +15,19 @@ testDatasets = {};
 
 for i = 1:length(trainFilenames)
     disp(['Loading training dataset ', trainFilenames{i}])
-    dataset = LoadConstitData(trainFilenames{i}, wordMap, relationMap);
+    dataset = LoadConstitData(trainFilenames{i}, wordMap, relationMap, true, hyperParams);
     trainDataset = [trainDataset; dataset];
 end
 
 for i = 1:length(testFilenames)
     disp(['Loading test dataset ', testFilenames{i}])
-    dataset = LoadConstitData(testFilenames{i}, wordMap, relationMap);
+    dataset = LoadConstitData(testFilenames{i}, wordMap, relationMap, false, hyperParams);
     testDatasets = [testDatasets, {dataset}];
 end
 
 for i = 1:length(splitFilenames)
     disp(['Loading split dataset ', splitFilenames{i}])
-    dataset = LoadConstitData(splitFilenames{i}, wordMap, relationMap);
+    dataset = LoadConstitData(splitFilenames{i}, wordMap, relationMap, false, hyperParams);
     randomOrder = randperm(length(dataset));
     endOfTrainPortion = ceil(length(dataset) * PERCENT_USED_FOR_TRAINING);
     testDatasets = [testDatasets, ...

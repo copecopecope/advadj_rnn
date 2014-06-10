@@ -1,21 +1,23 @@
 % Want to distribute this code? Have other questions? ->
 % sbowman@stanford.edu
-function [ cost, grad, trainingError, confusion ] = ComputeFullCostAndGrad( theta, decoder, data, hyperParams, ~ )
+function [ cost, grad, trainingError, confusion, dists ] = ComputeFullCostAndGrad( theta, decoder, data, hyperParams, ~ )
 % Compute gradient and cost with regularization over a set of examples
 % for some parameters.
 
 N = length(data);
 
 argout = nargout;
-% if nargout > 3
-%     confusions = zeros(N, 2);
-% end
+if nargout > 3
+    confusion = zeros(N, 2);
+end
 
 accumulatedCost = 0;
 accumulatedError = 0;
 if nargout > 1
     accumulatedGrad = zeros(length(theta), 1);
 end
+
+dists = zeros(N,21);
 
 % Parallelize
 if matlabpool('size') == 0 % checking to see if my pool is already open
@@ -30,27 +32,18 @@ if nargout > 1
         accumulatedGrad = accumulatedGrad + localGrad;
         
         localError = sum(data(i).relDist .* log(data(i).relDist ./ localPredDist)) % KL div
-      %   if (~localCorrect) && (argout > 2) && hyperParams.showExamples
-      %       disp(['for: ', data(i).leftTree.getText, ' ', ...
-      %             hyperParams.relations{data(i).relation}, ' ', ... 
-		    % data(i).rightTree.getText, ...
-      %             ' h:  ', hyperParams.relations{localPred}]);
-      %   end
-        
-        % if argout > 3
-        %     confusions(i,:) = [localPred, data(i).relation];
+
+        % dists_ = zeros(N,21)
+        % if hyperParams.recordError
+        %     dists_(i,1:10) = localPredDist;
+        %     dists_(i,11:20) = data(i).relDist;
+        %     dists_(i,21) = localError;
         % end
-             
+        % dists = dists + dists_;
+
         accumulatedError = accumulatedError + localError;
     end
     
-    % if nargout > 3
-    %     confusion = zeros(hyperParams.numRelations);
-    %     for i = 1:N
-    %        confusion(confusions(i,1), confusions(i,2)) = ...
-    %            confusion(confusions(i,1), confusions(i,2)) + 1;
-    %     end
-    % end
 else
     parfor i = 1:N
         localCost = ...
@@ -71,7 +64,6 @@ else
 end
 combinedCost = normalizedCost + regCost;
 
-% cost = [combinedCost normalizedCost regCost]; 
 cost = combinedCost;
 
 if nargout > 1

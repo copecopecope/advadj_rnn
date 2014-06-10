@@ -1,5 +1,5 @@
 % Want to distribute this code? Have other questions? -> sbowman@stanford.edu
-function [ data ] = LoadConstitData(filename, wordMap, relationMap, hyperParams)
+function [ data ] = LoadConstitData(filename, wordMap, relationMap, smoothing, hyperParams)
 % Load one file of constituent-pair data.
 
 disp(filename)
@@ -28,7 +28,11 @@ for line = 1:maxLine
         splitLine = splitLine{1};
 
         for i = 1:10
-            rawData(itemNo).relDist(i) = str2num(char(splitLine{i+2})) + 1; % 1 for regularization
+            if smoothing
+                rawData(itemNo).relDist(i) = str2num(char(splitLine{i+2})) + hyperParams.smoothing; % 1 for regularization
+            else
+                rawData(itemNo).relDist(i) = str2num(char(splitLine{i+2})) + .001; % 1 for regularization
+            end
         end
         rawData(itemNo).relDist = rawData(itemNo).relDist / sum(rawData(itemNo).relDist); % normalize
         rawData(itemNo).leftText = splitLine{1};

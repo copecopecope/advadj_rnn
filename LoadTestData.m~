@@ -1,0 +1,33 @@
+function LoadTestData(varsFilename)
+
+vars = {'theta','thetaDecoder'};
+load(varsFilename,'-mat',vars{:});
+
+[wordMap, relationMap, relations] = LoadTrainingData('./data-supp/vocab.csv');
+[hyperParams, options] = LoadOptions(relations, '.', true, true);
+
+trainListing = dir('data/advadj_train.csv');
+testListing = dir('data/advadj_test.csv');
+splitFilenames = {};
+testFilenames = {testListing.name}
+trainFilenames = {trainListing.name};
+[~,testDatasets] = LoadConstitDatasets(trainFilenames,splitFilenames,...
+				       testFilenames, wordMap, ...
+				       relationMap, hyperParams);
+
+disp('Running tests...')
+for i = 1:length(testDatasets{1})
+  data = testDatasets{2}{i};
+  N = length(data);
+  for j=1:N
+    disp(thetaDecoder)
+    [~,~,localPredDist] = ComputeCostAndGrad(theta, thetaDecoder, ...
+					     data(i), hyperParams);
+    localError = sum(data(i).relDist .* log(data(i).relDist ./ ...
+					    localPredDist));
+    disp(data(i).leftTree)
+    disp(localError)
+ end
+end
+
+end

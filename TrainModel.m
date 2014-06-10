@@ -1,4 +1,4 @@
-function TrainModel(expName)
+function TrainModel(expName, useTensors, smoothing)
 
 % define expName
 if ~exist(expName, 'dir')
@@ -9,12 +9,14 @@ end
 [wordMap, relationMap, relations] = LoadTrainingData('./data-supp/vocab.csv');
 
 % load hyperparameters and options for minFunc/adaGrad
-[hyperParams, options] = LoadOptions(relations, expName);
+[hyperParams, options] = LoadOptions(relations, expName, useTensors, smoothing);
 
-listing = dir('data/advadj.csv');
-splitFilenames = {listing.name};
-testFilenames = {}
-trainFilenames = {}
+% listing = dir('data/advadj_train.csv');
+trainListing = dir('data/advadj_train.csv');
+testListing = dir('data/advadj_test.csv');
+splitFilenames = {};
+testFilenames = {testListing.name}
+trainFilenames = {trainListing.name};
 
 splitFilenames = setdiff(splitFilenames, testFilenames);
 hyperParams.firstSplit = 3;
@@ -25,7 +27,7 @@ hyperParams.firstSplit = 3;
 % Load training/test data
 [trainDataset, testDatasets] = ...
     LoadConstitDatasets(trainFilenames, splitFilenames, ...
-    testFilenames, wordMap, relationMap);
+    testFilenames, wordMap, relationMap, hyperParams);
 % trainDataset = Symmetrize(trainDataset);
 
 % Train

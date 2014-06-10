@@ -1,5 +1,5 @@
-function [] = RunExperiment(expDir, useTensors)
+function [] = RunExperiment(expDir, useTensors, smoothing)
 
-TrainModel(expDir, useTensors);
+TrainModel(expDir, useTensors, smoothing);
 
 end

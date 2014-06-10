@@ -1,4 +1,4 @@
-function [hyperParams, options] = loadOptions(relations, expName)
+function [hyperParams, options] = loadOptions(relations, expName, useTensors, smoothing)
 
 % Set up hyperparameters:
 
@@ -34,6 +34,11 @@ hyperParams.showConfusions = false;
 % L1 v. L2 regularization
 hyperParams.norm = 2;
 
+% Laplace smoothing
+hyperParams.smoothing = smoothing;
+
+hyperParams.recordError = false;
+
 % Use untied composition layer params.
 hyperParams.untied = false; 
 
@@ -41,8 +46,8 @@ hyperParams.untied = false;
 hyperParams.datasetsPortion = 1;
 hyperParams.dataPortion = 1;
 
-hyperParams.useThirdOrder = true;
-hyperParams.useThirdOrderComparison = true;
+hyperParams.useThirdOrder = useTensors;
+hyperParams.useThirdOrderComparison = useTensors;
 
 % Nonlinearities.
 hyperParams.compNL = @Sigmoid;

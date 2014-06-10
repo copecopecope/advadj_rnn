@@ -1,0 +1,16 @@
+import sys
+
+if __name__=="__main__":
+
+    inFile = sys.argv[1]
+    outTrain = inFile.replace(".csv", "_train.csv")
+    outTest = inFile.replace(".csv", "_test.csv")
+
+    SPLIT_PERCENT = 0.70
+    
+    with open(inFile) as f:
+        lines = f.readlines()
+
+    lines.shuffle()
+
+    endOfTrain = ceil(len(lines)*SPLIT_PERCENT)
