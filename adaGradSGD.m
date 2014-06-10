@@ -49,8 +49,8 @@ for pass = 0:options.numPasses - 1
     else
        cost = CostGradFunc(theta, thetaDecoder, trainingData, hyperParams);
     end
-    if mod(pass, options.checkpointFreq) == 0
-        save([options.name, '/', 'theta-', options.runName, '@', ...
+    if mod(pass, options.checkpointFreq) == 0  
+      save([options.name, '/', 'theta-', options.runName, '@', ...
             num2str(pass)] , 'theta', 'thetaDecoder');
     end
 

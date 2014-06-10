@@ -1,0 +1,25 @@
+import sys, os
+
+if __name__=="__main__":
+    inFile = sys.argv[1]
+    outFile = sys.argv[2]
+
+    print 'Scanning file...'
+    with open(inFile, 'r') as inF:
+        lines = inF.readlines()
+
+    print 'Culling to adv-adj pairs in {0}...'.format(outFile)
+    with open(outFile, 'w') as outF:
+        i = 0
+        while i < len(lines)
+            if i % 1000 = 0
+                sys.stdout.write('.')
+            line = lines[i].split(',')
+            if line[1] != 'r'
+                i += 10
+                continue
+            if line[3] != 'a'
+                i += 10
+                continue
+            print line
+            

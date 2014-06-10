@@ -2,14 +2,7 @@
 function [ data ] = LoadConstitData(filename, wordMap, relationMap, hyperParams)
 % Load one file of constituent-pair data.
 
-% Append data-4/ if we don't have a full path:
-if isempty(strfind(filename, '/'))
-    if strfind(filename, 'quant_')
-        filename = ['grammars/data/', filename];
-    else   
-        filename = ['data-hold/', filename];
-    end
-end
+filename = ['data/' filename];
 fid = fopen(filename);
 C = textscan(fid,'%s','delimiter',sprintf('\n'));
 fclose(fid);
@@ -34,15 +27,8 @@ for line = 1:maxLine
         if ~(length(splitLine{1}) ~= 1 || splitLine{1} == '%')
             % Skip lines that are blank or have a multicharacter first chunk
             rawData(itemNo).relation = relationMap(splitLine{1});
-%                     fprintf(splitLine{1});
-%                     fprintf(' : ');
             rawData(itemNo).leftText = splitLine{2};
-%                     fprintf(splitLine{2});
-%                     fprintf(' :: ');
             rawData(itemNo).rightText = splitLine{3};
-%                     fprintf(splitLine{3});
-%                     fprintf(' :: ');
-
             itemNo = itemNo + 1;
         end
     end
@@ -52,9 +38,9 @@ disp('Done Reading in File');
 
 rawData = rawData(1:itemNo - 1);
 
-minpairs = 1;
-fname = 'imdb-advadj-with-ratings.tsv';
-[ goldDist, map ] = SplitData(fname,minpairs);
+% minpairs = 1;
+% fname = 'imdb-advadj-with-ratings.tsv';
+% [ goldDist, map ] = SplitData(fname,minpairs);
 
 % Build the dataset
 data = repmat(struct('relation', 0, 'leftTree', Tree(), 'rightTree', Tree(), 'goldDist', zeros(1,10), 'predDist', zeros(1,10)), ...
@@ -66,9 +52,9 @@ for dataInd = 1:length(rawData)
     data(dataInd).rightTree = Tree.makeTree(rawData(dataInd).rightText, wordMap);
     data(dataInd).relation = rawData(dataInd).relation;
     
-    advadj = strcat(rawData(dataInd).leftText,',',rawData(dataInd).rightText);
-    index = map(advadj);
-    data(dataInd).goldDist = goldDist(index, :);
+    %advadj = strcat(rawData(dataInd).leftText,',',rawData(dataInd).rightText);
+    %index = map(advadj);
+    %data(dataInd).goldDist = goldDist(index, :);
 %     disp('gold Dist');
 %     disp(data(dataInd).goldDist);
 end
