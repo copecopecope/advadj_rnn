@@ -25,26 +25,17 @@ for pass = 0:options.numPasses - 1
         
         % Test on test data
         if nargin > 5
-            if mod(pass, options.confusionFreq) == 0 && pass > 0
-                hyperParams.showConfusions = true;
-            else
-                hyperParams.showConfusions = false;
-            end
-
-            if (mod(pass, options.examplesFreq) == 0 || mod(pass, options.confusionFreq) == 0) && pass > 0
-                disp('Test data:')
-            end
             testErr = TestModel(CostGradFunc, theta, thetaDecoder, testDatasets, hyperParams);
             bestTestErr = min(testErr, bestTestErr);
         else
             testErr = -1;
         end
         if testErr ~= -1
-            disp(['pass ', num2str(pass), ' train PER: ', num2str(acc), ...
-                  ' test PER: ', num2str(testErr), ' (best: ', ...
+            disp(['pass ', num2str(pass), ' train KL: ', num2str(acc), ...
+                  ' test KL: ', num2str(testErr), ' (best: ', ...
                   num2str(bestTestErr), ')']);
         else
-            disp(['pass ', num2str(pass), ' PER: ', num2str(acc)]);
+            disp(['pass ', num2str(pass), ' KL: ', num2str(acc)]);
         end
     else
        cost = CostGradFunc(theta, thetaDecoder, trainingData, hyperParams);

@@ -1,5 +1,5 @@
-function [] = RunExperiment()
+function [] = RunExperiment(expDir, useTensors)
 
-TrainModel('split-all');
+TrainModel(expDir, useTensors);
 
 end

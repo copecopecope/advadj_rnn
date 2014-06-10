@@ -1,5 +1,5 @@
 % Want to distribute this code? Have other questions? -> sbowman@stanford.edu
-function [ cost, grad, pred, predDist ] = ComputeCostAndGrad( theta, decoder, dataPoint, hyperParams )
+function [ cost, grad, predDist ] = ComputeCostAndGrad( theta, decoder, dataPoint, hyperParams )
 % Compute cost, gradient, and predicted label for one example.
 
 % Unpack theta
@@ -22,7 +22,7 @@ end
 
 leftTree = dataPoint.leftTree;
 rightTree = dataPoint.rightTree;
-trueRelation = dataPoint.relation;
+trueDist = dataPoint.relDist;
 
 % Make sure word features are current
 leftTree.updateFeatures(wordFeatures, compositionMatrices, ...
@@ -57,16 +57,11 @@ for layer = 1:(hyperParams.topDepth - 1)
 end
 
 
-relationProbs = ComputeSoftmaxProbabilities( ...
+predDist = ComputeSoftmaxProbabilities( ...
                     extraInputs(:,hyperParams.topDepth), classifierParameters);
 
-
-%fprintf(trueRelation, '\n');
 % Compute cost
-cost = Objective(trueRelation, relationProbs);
-
-% disp('=');
-% disp(cost);
+cost = Objective(trueDist, predDist);
 
 % Produce gradient
 if nargout > 1    
@@ -84,7 +79,7 @@ if nargout > 1
     
     [localSoftmaxGradient, softmaxDelta] = ...
         ComputeSoftmaxGradient (hyperParams, classifierParameters, ...
-                                relationProbs, trueRelation,...
+                                predDist, trueDist,...
                                 extraInputs(:,hyperParams.topDepth));
     
     % Compute gradients for extra top layers
@@ -156,13 +151,8 @@ if nargout > 1
         localExtraMatrixGradients, localExtraBiasGradients);
 end
 
-% Compute prediction
-if nargout > 2
-    [~, pred] = max(relationProbs);
-end
-
 if nargout > 3
-   predDist = relationProbs;
+   predDist = predDist;
    
 end
 

@@ -8,7 +8,7 @@ function [ trainDataset, testDatasetsCell ] = LoadConstitDatasets ...
 % testFilenames: Load these files as test data.
 % splitFilenames: Split these files into train and test data.
 
-PERCENT_USED_FOR_TRAINING = 0.85;
+PERCENT_USED_FOR_TRAINING = 0.70;
 
 trainDataset = [];
 testDatasets = {};
@@ -34,6 +34,7 @@ for i = 1:length(splitFilenames)
                     {dataset(randomOrder(endOfTrainPortion + 1:length(dataset)))}];
     trainDataset = [trainDataset; dataset(randomOrder(1:endOfTrainPortion))];
 end
+
 
 % Evaluate on test datasets, and show set-by-set results
 datasetNames = [testFilenames, splitFilenames];

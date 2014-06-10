@@ -6,12 +6,12 @@ if ~exist(expName, 'dir')
 end
 
 % load wordMap
-[wordMap, relationMap, relations] = LoadTrainingData('./data-supp/vocab.tsv');
+[wordMap, relationMap, relations] = LoadTrainingData('./data-supp/vocab.csv');
 
 % load hyperparameters and options for minFunc/adaGrad
 [hyperParams, options] = LoadOptions(relations, expName);
 
-listing = dir('data/*.tsv');
+listing = dir('data/advadj.csv');
 splitFilenames = {listing.name};
 testFilenames = {}
 trainFilenames = {}
@@ -26,7 +26,7 @@ hyperParams.firstSplit = 3;
 [trainDataset, testDatasets] = ...
     LoadConstitDatasets(trainFilenames, splitFilenames, ...
     testFilenames, wordMap, relationMap);
-trainDataset = Symmetrize(trainDataset);
+% trainDataset = Symmetrize(trainDataset);
 
 % Train
 disp('Training')
@@ -80,10 +80,4 @@ disp('tr:  1     2     3     4     5     6     7     8     9     10')
 disp(teConfusion)
 disp(teAcc)
 
-% disp(goldDist)
-% disp(predDist)
-% 
-% KLdist = KLDiv(goldDist,predDist)
-% 
-    
 end

@@ -7,12 +7,12 @@ function [ cost, grad, trainingError, confusion ] = ComputeFullCostAndGrad( thet
 N = length(data);
 
 argout = nargout;
-if nargout > 3
-    confusions = zeros(N, 2);
-end
+% if nargout > 3
+%     confusions = zeros(N, 2);
+% end
 
 accumulatedCost = 0;
-accumulatedSuccess = 0;
+accumulatedError = 0;
 if nargout > 1
     accumulatedGrad = zeros(length(theta), 1);
 end
@@ -24,33 +24,33 @@ end
 
 if nargout > 1
     parfor i = 1:N
-        [localCost, localGrad, localPred] = ...
+        [localCost, localGrad, localPredDist] = ...
             ComputeCostAndGrad(theta, decoder, data(i), hyperParams);
         accumulatedCost = accumulatedCost + localCost;
         accumulatedGrad = accumulatedGrad + localGrad;
         
-        localCorrect = localPred == data(i).relation;
-        if (~localCorrect) && (argout > 2) && hyperParams.showExamples
-            disp(['for: ', data(i).leftTree.getText, ' ', ...
-                  hyperParams.relations{data(i).relation}, ' ', ... 
-		    data(i).rightTree.getText, ...
-                  ' h:  ', hyperParams.relations{localPred}]);
-        end
+        localError = sum(data(i).relDist .* log(data(i).relDist ./ localPredDist)) % KL div
+      %   if (~localCorrect) && (argout > 2) && hyperParams.showExamples
+      %       disp(['for: ', data(i).leftTree.getText, ' ', ...
+      %             hyperParams.relations{data(i).relation}, ' ', ... 
+		    % data(i).rightTree.getText, ...
+      %             ' h:  ', hyperParams.relations{localPred}]);
+      %   end
         
-        if argout > 3
-            confusions(i,:) = [localPred, data(i).relation];
-        end
+        % if argout > 3
+        %     confusions(i,:) = [localPred, data(i).relation];
+        % end
              
-        accumulatedSuccess = accumulatedSuccess + localCorrect;
+        accumulatedError = accumulatedError + localError;
     end
     
-    if nargout > 3
-        confusion = zeros(hyperParams.numRelations);
-        for i = 1:N
-           confusion(confusions(i,1), confusions(i,2)) = ...
-               confusion(confusions(i,1), confusions(i,2)) + 1;
-        end
-    end
+    % if nargout > 3
+    %     confusion = zeros(hyperParams.numRelations);
+    %     for i = 1:N
+    %        confusion(confusions(i,1), confusions(i,2)) = ...
+    %            confusion(confusions(i,1), confusions(i,2)) + 1;
+    %     end
+    % end
 else
     parfor i = 1:N
         localCost = ...
@@ -83,7 +83,7 @@ if nargout > 1
         % Apply L1 regularization
         grad = grad + hyperParams.lambda * sign(theta);
     end
-    trainingError = 1 - (accumulatedSuccess / N);
+    trainingError = accumulatedError/N;
 end
 
 end
